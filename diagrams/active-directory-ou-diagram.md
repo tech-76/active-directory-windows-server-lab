@@ -2,113 +2,185 @@
 
 ## Purpose
 
-This diagram shows a professional sample Active Directory Organizational Unit structure for an IT support lab. It demonstrates how user accounts, computers, groups, administrative accounts, service accounts, and disabled objects can be organized in a clean Windows Server environment.
+This document shows a professional Active Directory Organizational Unit structure for an IT support lab. Instead of using one large diagram that becomes too small on GitHub, this version separates the design into smaller readable diagrams.
+
+---
+
+# 1. High-Level Active Directory Structure
 
 ```mermaid
 flowchart TB
-    ROOT["corp.example.local<br/>Active Directory Domain"]
+    A["corp.example.local<br/>Active Directory Domain"]
 
-    ROOT --> USERS["OU=Users<br/>Standard employee user accounts"]
-    ROOT --> COMPUTERS["OU=Computers<br/>Domain-joined workstations and servers"]
-    ROOT --> GROUPS["OU=Groups<br/>Security and distribution groups"]
-    ROOT --> ADMINS["OU=Admin Accounts<br/>Privileged and delegated admin accounts"]
-    ROOT --> SERVICE["OU=Service Accounts<br/>Application and system service accounts"]
-    ROOT --> DISABLED["OU=Disabled Objects<br/>Former users and retired devices"]
-
-    USERS --> USERS_DEPT["Department Users"]
-    USERS_DEPT --> U_ADMIN["OU=Administration<br/>Administrative staff"]
-    USERS_DEPT --> U_FIN["OU=Finance<br/>Finance users"]
-    USERS_DEPT --> U_HR["OU=Human Resources<br/>HR users"]
-    USERS_DEPT --> U_IT["OU=IT<br/>IT support users"]
-    USERS_DEPT --> U_OPS["OU=Operations<br/>Operations users"]
-    USERS_DEPT --> U_SALES["OU=Sales<br/>Sales users"]
-
-    COMPUTERS --> COMP_TYPE["Device Type"]
-    COMP_TYPE --> C_DESKTOPS["OU=Desktops<br/>Office desktop computers"]
-    COMP_TYPE --> C_LAPTOPS["OU=Laptops<br/>Assigned user laptops"]
-    COMP_TYPE --> C_SHARED["OU=Shared Workstations<br/>Front desk and shared PCs"]
-    COMP_TYPE --> C_SERVERS["OU=Servers<br/>Windows servers"]
-    COMP_TYPE --> C_TEST["OU=Test Devices<br/>Lab and testing machines"]
-
-    GROUPS --> G_ACCESS["Access Control Groups"]
-    G_ACCESS --> G_SECURITY["OU=Security Groups<br/>Folder, app, and resource access"]
-    G_ACCESS --> G_DISTRIBUTION["OU=Distribution Groups<br/>Email distribution lists"]
-    G_ACCESS --> G_APP["OU=Application Groups<br/>Business application access"]
-    G_ACCESS --> G_VPN["OU=VPN Groups<br/>Remote access users"]
-
-    ADMINS --> A_STANDARD["OU=Help Desk Admins<br/>Delegated support permissions"]
-    ADMINS --> A_SERVER["OU=Server Admins<br/>Server administration access"]
-    ADMINS --> A_DOMAIN["OU=Domain Admins<br/>Restricted privileged accounts"]
-
-    SERVICE --> S_BACKUP["svc-backup<br/>Backup service account"]
-    SERVICE --> S_PRINT["svc-print<br/>Print service account"]
-    SERVICE --> S_MONITOR["svc-monitoring<br/>Monitoring service account"]
-    SERVICE --> S_APP["svc-application<br/>Application service account"]
-
-    DISABLED --> D_USERS["OU=Disabled Users<br/>Former employee accounts"]
-    DISABLED --> D_COMPUTERS["OU=Disabled Computers<br/>Retired computer objects"]
-    DISABLED --> D_REVIEW["OU=Pending Review<br/>Objects awaiting cleanup"]
+    A --> B["OU=Users<br/>Employee user accounts"]
+    A --> C["OU=Computers<br/>Workstations and servers"]
+    A --> D["OU=Groups<br/>Security and distribution groups"]
+    A --> E["OU=Admin Accounts<br/>Privileged accounts"]
+    A --> F["OU=Service Accounts<br/>System and application accounts"]
+    A --> G["OU=Disabled Objects<br/>Former users and retired devices"]
 
     classDef domain fill:#111827,stroke:#030712,color:#ffffff,stroke-width:2px;
-    classDef primary fill:#dbeafe,stroke:#2563eb,color:#111827,stroke-width:1px;
-    classDef users fill:#dcfce7,stroke:#16a34a,color:#111827,stroke-width:1px;
-    classDef computers fill:#fef3c7,stroke:#d97706,color:#111827,stroke-width:1px;
-    classDef groups fill:#ede9fe,stroke:#7c3aed,color:#111827,stroke-width:1px;
-    classDef admins fill:#fee2e2,stroke:#dc2626,color:#111827,stroke-width:1px;
+    classDef ou fill:#dbeafe,stroke:#2563eb,color:#111827,stroke-width:1px;
+
+    class A domain;
+    class B,C,D,E,F,G ou;
+```
+
+## What This Shows
+
+This high-level structure separates users, computers, groups, admin accounts, service accounts, and disabled objects. This makes Active Directory easier to manage, troubleshoot, and document.
+
+---
+
+# 2. Users OU Structure
+
+```mermaid
+flowchart TB
+    U["OU=Users<br/>Employee Accounts"]
+
+    U --> U1["OU=Administration<br/>Administrative staff"]
+    U --> U2["OU=Finance<br/>Finance users"]
+    U --> U3["OU=Human Resources<br/>HR users"]
+    U --> U4["OU=IT<br/>IT support and technical users"]
+    U --> U5["OU=Operations<br/>Operations users"]
+    U --> U6["OU=Sales<br/>Sales users"]
+
+    classDef parent fill:#1f2937,stroke:#111827,color:#ffffff,stroke-width:2px;
+    classDef department fill:#dcfce7,stroke:#16a34a,color:#111827,stroke-width:1px;
+
+    class U parent;
+    class U1,U2,U3,U4,U5,U6 department;
+```
+
+## Support Use Cases
+
+| Scenario               | OU Location                   |
+| ---------------------- | ----------------------------- |
+| New finance employee   | `OU=Users/OU=Finance`         |
+| New IT support user    | `OU=Users/OU=IT`              |
+| HR employee account    | `OU=Users/OU=Human Resources` |
+| Sales employee account | `OU=Users/OU=Sales`           |
+
+---
+
+# 3. Computers OU Structure
+
+```mermaid
+flowchart TB
+    C["OU=Computers<br/>Domain-Joined Devices"]
+
+    C --> C1["OU=Desktops<br/>Office desktop computers"]
+    C --> C2["OU=Laptops<br/>Assigned user laptops"]
+    C --> C3["OU=Shared Workstations<br/>Front desk and shared PCs"]
+    C --> C4["OU=Servers<br/>Windows servers"]
+    C --> C5["OU=Test Devices<br/>Lab and testing machines"]
+
+    classDef parent fill:#1f2937,stroke:#111827,color:#ffffff,stroke-width:2px;
+    classDef device fill:#fef3c7,stroke:#d97706,color:#111827,stroke-width:1px;
+
+    class C parent;
+    class C1,C2,C3,C4,C5 device;
+```
+
+## Support Use Cases
+
+| Scenario             | OU Location                           |
+| -------------------- | ------------------------------------- |
+| New staff laptop     | `OU=Computers/OU=Laptops`             |
+| Office desktop       | `OU=Computers/OU=Desktops`            |
+| Shared front desk PC | `OU=Computers/OU=Shared Workstations` |
+| Lab testing device   | `OU=Computers/OU=Test Devices`        |
+
+---
+
+# 4. Groups OU Structure
+
+```mermaid
+flowchart TB
+    G["OU=Groups<br/>Access and Communication Groups"]
+
+    G --> G1["OU=Security Groups<br/>Folder and resource access"]
+    G --> G2["OU=Distribution Groups<br/>Email distribution lists"]
+    G --> G3["OU=Application Groups<br/>Software and application access"]
+    G --> G4["OU=VPN Groups<br/>Remote access permissions"]
+
+    classDef parent fill:#1f2937,stroke:#111827,color:#ffffff,stroke-width:2px;
+    classDef group fill:#ede9fe,stroke:#7c3aed,color:#111827,stroke-width:1px;
+
+    class G parent;
+    class G1,G2,G3,G4 group;
+```
+
+## Support Use Cases
+
+| Scenario                   | OU Location                        |
+| -------------------------- | ---------------------------------- |
+| Shared folder access       | `OU=Groups/OU=Security Groups`     |
+| Department email list      | `OU=Groups/OU=Distribution Groups` |
+| Application access request | `OU=Groups/OU=Application Groups`  |
+| VPN access request         | `OU=Groups/OU=VPN Groups`          |
+
+---
+
+# 5. Admin, Service, and Disabled Account Structure
+
+```mermaid
+flowchart TB
+    A["Privileged and Special Account Management"]
+
+    A --> ADM["OU=Admin Accounts<br/>Privileged access"]
+    A --> SVC["OU=Service Accounts<br/>System accounts"]
+    A --> DIS["OU=Disabled Objects<br/>Inactive accounts and devices"]
+
+    ADM --> ADM1["OU=Help Desk Admins<br/>Delegated support permissions"]
+    ADM --> ADM2["OU=Server Admins<br/>Server administration access"]
+    ADM --> ADM3["OU=Domain Admins<br/>Restricted privileged accounts"]
+
+    SVC --> SVC1["svc-backup<br/>Backup service account"]
+    SVC --> SVC2["svc-print<br/>Print service account"]
+    SVC --> SVC3["svc-monitoring<br/>Monitoring service account"]
+
+    DIS --> DIS1["OU=Disabled Users<br/>Former employee accounts"]
+    DIS --> DIS2["OU=Disabled Computers<br/>Retired computer objects"]
+    DIS --> DIS3["OU=Pending Review<br/>Objects awaiting cleanup"]
+
+    classDef parent fill:#1f2937,stroke:#111827,color:#ffffff,stroke-width:2px;
+    classDef admin fill:#fee2e2,stroke:#dc2626,color:#111827,stroke-width:1px;
     classDef service fill:#fce7f3,stroke:#db2777,color:#111827,stroke-width:1px;
     classDef disabled fill:#e5e7eb,stroke:#4b5563,color:#111827,stroke-width:1px;
 
-    class ROOT domain;
-    class USERS,COMPUTERS,GROUPS,ADMINS,SERVICE,DISABLED primary;
-    class USERS_DEPT,U_ADMIN,U_FIN,U_HR,U_IT,U_OPS,U_SALES users;
-    class COMP_TYPE,C_DESKTOPS,C_LAPTOPS,C_SHARED,C_SERVERS,C_TEST computers;
-    class G_ACCESS,G_SECURITY,G_DISTRIBUTION,G_APP,G_VPN groups;
-    class A_STANDARD,A_SERVER,A_DOMAIN admins;
-    class S_BACKUP,S_PRINT,S_MONITOR,S_APP service;
-    class D_USERS,D_COMPUTERS,D_REVIEW disabled;
+    class A parent;
+    class ADM,ADM1,ADM2,ADM3 admin;
+    class SVC,SVC1,SVC2,SVC3 service;
+    class DIS,DIS1,DIS2,DIS3 disabled;
 ```
 
-## What This Diagram Demonstrates
+## Support Use Cases
 
-* Active Directory domain organization
-* Department-based user account structure
-* Computer account separation by device type
-* Security group organization
-* Distribution group organization
-* VPN and application access grouping
-* Admin account separation
-* Service account separation
-* Disabled account management
-* Basic Windows Server administration documentation
+| Scenario                  | Recommended Location                        |
+| ------------------------- | ------------------------------------------- |
+| Help desk delegated admin | `OU=Admin Accounts/OU=Help Desk Admins`     |
+| Backup service account    | `OU=Service Accounts`                       |
+| Departed employee         | `OU=Disabled Objects/OU=Disabled Users`     |
+| Retired workstation       | `OU=Disabled Objects/OU=Disabled Computers` |
+| Account pending review    | `OU=Disabled Objects/OU=Pending Review`     |
 
-## Why This OU Structure Is Useful
+---
 
-A clean OU structure helps IT support teams manage accounts, devices, access, and troubleshooting more effectively. It also supports better onboarding, offboarding, Group Policy planning, access control, and account review processes.
+# Why This Structure Is Professional
 
-## Example Help Desk Use Cases
+This OU structure is useful because it separates different account and device types. It also supports better onboarding, offboarding, access control, security review, and help desk troubleshooting.
 
-| Scenario                     | Recommended OU Area                         |
-| ---------------------------- | ------------------------------------------- |
-| New employee account         | `OU=Users` under the correct department     |
-| New company laptop           | `OU=Computers/OU=Laptops`                   |
-| Shared front desk computer   | `OU=Computers/OU=Shared Workstations`       |
-| Shared folder access request | `OU=Groups/OU=Security Groups`              |
-| VPN access request           | `OU=Groups/OU=VPN Groups`                   |
-| Business application access  | `OU=Groups/OU=Application Groups`           |
-| Help desk delegated admin    | `OU=Admin Accounts/OU=Help Desk Admins`     |
-| Backup system account        | `OU=Service Accounts`                       |
-| Departed employee account    | `OU=Disabled Objects/OU=Disabled Users`     |
-| Retired workstation          | `OU=Disabled Objects/OU=Disabled Computers` |
+## Best Practices Demonstrated
 
-## Support Notes
-
-* Standard users should be separated from admin accounts.
-* Service accounts should not be mixed with regular user accounts.
-* Disabled accounts should be moved to a dedicated disabled OU.
-* Security groups should be used for access instead of assigning permissions directly to individual users.
-* Computer accounts should be organized by device type or location.
-* All account changes should be documented in a help desk ticket.
-* Privileged access should require approval and follow least privilege.
+* Keep standard user accounts separate from admin accounts.
+* Keep service accounts separate from employee accounts.
+* Organize users by department.
+* Organize computers by device type.
+* Use groups for permissions and access control.
+* Move disabled users and retired devices into a separate OU.
+* Document account changes in a ticket.
+* Follow least privilege for admin access.
 
 ## Portfolio Note
 
